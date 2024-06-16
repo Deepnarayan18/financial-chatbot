@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0; 
+            
+        }
+
+        nav {
+            
+            color: #2417e0;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        #title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #chat-container {
+            width: 600px;
+            margin: auto;
+            border: 1px solid #ccc;
+            padding: 60px;
+            margin-top: 20px;
+        }
+        #conversation {
+            height: 300px;
+            width: 100%;
+            border: 1px solid #ddd;
+            overflow-y: scroll;
+            padding: 16px;
+        }
+        #user_input {
+            width: calc(100% - 6px);
+            padding: 17px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        #send_button, #clear_button {
+            padding: 5px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <img id="logo" src="https://static.vecteezy.com/system/resources/previews/011/894/733/non_2x/artificial-intelligence-ai-robot-chat-bot-logo-template-free-vector.jpg" alt="Logo">
+        <h1 id="title">Financial Chatbot</h1>
+    </nav>
+    <div id="chat-container">
+        <div id="conversation" class="scrollbar">
+            <p>Welcome! Ask me anything related to finance.</p>
+        </div>
+        <form id="message-form">
+            <input type="text" id="user_input" name="user_input" placeholder="Type your message...">
+            <button type="submit" id="send_button">Send</button>
+            <button type="button" id="clear_button">Clear</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('message-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var userMessage = document.getElementById('user_input').value;
+            if (userMessage.trim() !== '') {
+                displayMessage('You: ' + userMessage);
+                fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'user_input=' + encodeURIComponent(userMessage)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displayMessage('Chatbot: ' + data.response);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    displayMessage('Chatbot: An error occurred.');
+                });
+                document.getElementById('user_input').value = '';
+            }
+        });
+
+        document.getElementById('clear_button').addEventListener('click', function() {
+            var conversationElement = document.getElementById('conversation');
+            conversationElement.innerHTML = '<p>Welcome! Ask me anything related to finance.</p>';
+        });
+
+        function displayMessage(message) {
+            var conversationElement = document.getElementById('conversation');
+            var p = document.createElement('p');
+            p.textContent = message;
+            conversationElement.appendChild(p);
+            conversationElement.scrollTop = conversationElement.scrollHeight;
+        }
+    </script>
+</body>
+</html>
